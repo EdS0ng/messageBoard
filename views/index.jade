@@ -1,0 +1,39 @@
+doctype html
+html(lang="en")
+  head
+    title Home
+    link(href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet")
+    link(href="css/style.css" rel="stylesheet")
+  body
+    #editModal.modal.fade(role="dialog")
+      .modal-dialog
+        .modal-content
+          .modal-header
+            button.close(data-dismiss="modal") &times; 
+            h4.modal-title Edit Message
+          .modal-body
+            textarea.newMessage(placeholder="New Message")
+          .modal-footer
+            button.btn.btn-default.submit(data-dismiss="modal") Submit Edit
+    .container-fluid
+      br
+      .jumbotron
+        h1 Message Board
+      .inputArea
+        label(for="userName") Username:
+        input#userName(placeholder="Input Username")
+        label(for="message") Message: 
+        textarea#message(placeholder="Type Your Message Here")
+        button.btn.btn-default.post Comment
+      .displayMessages
+          each element in messages
+            .fullComment
+              span= element.name
+              span.time= element.time
+              .comment= element.message
+              button.btn.btn-default.edit(id="#{element._id}" data-toggle="modal" data-target="#editModal") Edit
+              button.btn.btn-default.remove(id="#{element._id}") Delete
+    script(src='bower_components/jquery/dist/jquery.min.js')
+    script(src='bower_components/moment/moment.js')
+    script(src='bower_components/bootstrap/js/modal.js')
+    script(src='js/main.js')
