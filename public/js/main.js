@@ -3,7 +3,6 @@
 $(document).ready(init);
 
 function init() {
-  console.log('Hello jQuery!');
   $('.post').click(postMessage);
   $('.displayMessages').click(eventRouter);
   $('.submit').click(putEdit);
@@ -24,7 +23,19 @@ function eventRouter (e){
 function postMessage (){
   var userName = $('#userName').val();
   var message = $('#message').val();
+  $('#userName').val('');
+  $('#message').val('');
   var time = moment().format("dddd, MMMM Do YYYY, h:mm:ss a");
+  var fullDiv = createMessage(userName, message, time);
+  var toSend = {name: userName, message: message, timePosted: time}
+  $.post('/', toSend).done(function (data){
+    fullDiv.children('.edit').attr('id', data);
+    fullDiv.children('.remove').attr('id', data);
+    $('.displayMessages').append(fullDiv);
+  });
+}
+
+function createMessage (userName, message, time){
   var messageDiv = $(document.createElement('div'));
   var fullDiv = $(document.createElement('div'));
   var editBtn = $(document.createElement('button'));
@@ -34,23 +45,15 @@ function postMessage (){
   timeSpan.text(time).attr('class', 'time');
   messageDiv.text(message).attr('class', 'comment');
   nameSpan.text(userName);
-  editBtn.attr('class', 'btn btn-default edit').text('Edit');
+  editBtn.attr('class', 'btn btn-default edit').attr("data-toggle", 'modal').attr('data-target','#editModal').text('Edit');
   fullDiv.attr('class', 'fullComment');
   delBtn.attr('class', 'btn btn-default remove').text('Delete');
-  var toSend = {name: userName, message: message, timePosted: time}
-  $.post('/', toSend).done(function (data){
-    console.log(data);
-    editBtn.attr('id', data);
-    delBtn.attr('id', data);
-    fullDiv.append(nameSpan, timeSpan, messageDiv, editBtn, delBtn);
-    $('.displayMessages').append(fullDiv);
-  });
-
+  fullDiv.append(nameSpan, timeSpan, messageDiv, editBtn, delBtn);
+  return fullDiv;
 }
 
 function removeMessage (e){
   var dbId = e.target.id;
-  console.log(dbId);
   if (window.confirm('Delete your message?')){
     $.ajax({
     url: '/'+dbId,
@@ -73,7 +76,6 @@ function putEdit (){
     data: dataObject,
     // dataType: 'json',
     success: function(result) {
-        console.log("success");
         $(editTarget).siblings('.comment').text(edited);
         $(editTarget).siblings('.time').text('edited: ' +time);
     }
